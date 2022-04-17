@@ -15,7 +15,7 @@ from torch.utils.data import Dataset
 from torchvision.datasets.folder import pil_loader
 from transform import get_transform
 
-
+# MovieNetDataset의 super class
 class BaseDataset(Dataset):
     def __init__(self, cfg, mode, is_train):
         self.cfg = cfg
@@ -38,6 +38,7 @@ class BaseDataset(Dataset):
     def load_image(self, path):
         return pil_loader(path)
 
+    # shot당 randomly sampled된 keyframe 하나 또는 모든 keyframe 추출
     def load_shot_keyframes(self, path):
         shot = None
         if self.is_train and self.use_single_keyframe:
@@ -49,6 +50,7 @@ class BaseDataset(Dataset):
         assert shot is not None
         return shot
 
+    # video 하나당 shot list 추출
     def load_shot_list(self, vid, shot_idx):
         shot_list = []
         cache = {}
@@ -65,6 +67,7 @@ class BaseDataset(Dataset):
             shot_list.extend(shot)
         return shot_list
 
+    # load_shot_list에 대한 wrapper
     def load_shot(self, vid, sid):
         """
         Args:
@@ -78,6 +81,7 @@ class BaseDataset(Dataset):
         video = self.load_shot_list(vid, sid)
         return video, len(sid)
 
+    # input에 random noise를 주는듯
     def init_transform(self, cfg):
         if self.mode == "extract_shot":
             self.transform = get_transform(cfg.TEST.TRANSFORM)

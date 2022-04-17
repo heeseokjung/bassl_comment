@@ -96,7 +96,7 @@ class TransformerCRN(nn.Module):
         self.encoder = BertEncoder(cfg)
 
         nn_size = cfg.neighbor_size + 2  # +1 for center shot, +1 for cls
-        self.register_buffer(
+        self.register_buffer( # parameter로 간주되지 않는 layer, gradient update를 하지 않음
             "attention_mask",
             self._get_extended_attention_mask(torch.ones((1, nn_size)).float()),
         )

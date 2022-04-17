@@ -21,12 +21,13 @@ from pretrain.utils.main_utils import (
 def main():
     # init cfg
     cfg = init_hydra_config(mode="pretrain")
-    apply_random_seed(cfg)
+    apply_random_seed(cfg) # random state에 대한 seed 설정
     print_cfg(cfg)
 
     # init dataloader
     loaders = []
     cfg, train_loader = init_data_loader(cfg, mode="pretrain", is_train=True)
+        # torch.utils.data.DataLoader 타입
     loaders.append(train_loader)
     if cfg.TEST.KNN_VALIDATION:
         _, val_loader = init_data_loader(cfg, mode="pretrain", is_train=False)
@@ -34,9 +35,11 @@ def main():
 
     # init model
     cfg, model = init_model(cfg)
+        # PretrainingWrapper 타입
 
     # init trainer
     cfg, trainer = init_trainer(cfg)
+        # pl.Trainer 타입
 
     # train
     logging.info(

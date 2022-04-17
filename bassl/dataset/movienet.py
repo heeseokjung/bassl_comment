@@ -20,6 +20,7 @@ class MovieNetDataset(BaseDataset):
         super(MovieNetDataset, self).__init__(cfg, mode, is_train)
 
         logging.info(f"Load Dataset: {cfg.DATASET}")
+        # raw image가 아닌 encoded shot을 저장한 것을 쓰는 경우
         if mode == "finetune" and not self.use_raw_shot:
             assert len(self.cfg.PRETRAINED_LOAD_FROM) > 0
             self.shot_repr_dir = os.path.join(

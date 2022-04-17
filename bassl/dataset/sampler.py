@@ -7,13 +7,13 @@
 import random
 import numpy as np
 
-
+# 그냥 ceter shot id 리턴
 class InstanceShotSampler:
     """ This is for instance at pre-training stage """
     def __call__(self, center_sid: int, *args, **kwargs):
         return center_sid
 
-
+# 
 class TemporalShotSampler:
     """ This is for temporal at pre-training stage """
     def __init__(self, neighbor_size: int):
@@ -33,7 +33,7 @@ class TemporalShotSampler:
         )
         return shot_idx
 
-
+# DTW를 적용하기 위해 dense set과 sparse set으로 나눔
 class SequenceShotSampler:
     """ This is for bassl or shotcol at pre-training stage """
     def __init__(self, neighbor_size: int, neighbor_interval: int):
@@ -82,7 +82,7 @@ class SequenceShotSampler:
         shot_idx = [sparse_idx_to_dense, dense_shot_idx]
         return shot_idx
 
-
+# fine-tuning에서 사용할 때
 class NeighborShotSampler:
     """ This is for scene boundary detection (sbd), i.e., fine-tuning stage """
     def __init__(self, neighbor_size: int = 8):

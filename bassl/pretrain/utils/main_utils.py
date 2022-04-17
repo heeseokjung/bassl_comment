@@ -61,6 +61,7 @@ def load_pretrained_config(cfg):
 def init_data_loader(cfg, mode, is_train):
     data_loader = torch.utils.data.DataLoader(
         dataset=get_dataset(cfg, mode=mode, is_train=is_train),
+        # MovieNetDataset 타입
         batch_size=cfg.TRAIN.BATCH_SIZE.batch_size_per_proc,
         num_workers=cfg.TRAIN.NUM_WORKERS,
         pin_memory=cfg.TRAIN.PIN_MEMORY,
@@ -70,16 +71,20 @@ def init_data_loader(cfg, mode, is_train):
     )
     if is_train:
         # need for warmup
+        # (데이터셋 전체 크기) / (미니배치 크기) -> 한 epoch당 iterations 수
+        # warmup steps를 몇으로 할지 계산하는데 쓰임
         cfg.TRAIN.TRAIN_ITERS_PER_EPOCH = (
             len(data_loader.dataset) // cfg.TRAIN.BATCH_SIZE.effective_batch_size
         )
+            
     return cfg, data_loader
 
 
 def init_model(cfg):
-    shot_encoder = get_shot_encoder(cfg)
-    loss = get_loss(cfg)
-    crn = get_contextual_relation_network(cfg)
+    shot_encoder = get_shot_encoder(cfg) # shot encoder 로드, ResNet50
+    loss = get_loss(cfg) # 어떤 loss를 사용할 것인지
+    crn = get_contextual_relation_network(cfg) # crn 로드, TransformerCRN 클래스
+    # pretrained model을 불러오는 경우
     if "LOAD_FROM" in cfg and len(cfg.LOAD_FROM) > 0:
         print("LOAD MODEL WEIGHTS FROM: ", cfg.LOAD_FROM)
         model = PretrainingWrapper.load_from_checkpoint(
@@ -104,8 +109,9 @@ def init_trainer(cfg):
         logs_path = os.path.join(cfg.LOG_PATH, cfg.EXPR_NAME)
         os.makedirs(logs_path, exist_ok=True)
         logger = pl.loggers.TensorBoardLogger(logs_path, version=0)
+            # 텐서보드 로깅을 하고 있음 -> 나중에 참고
 
-        # checkpoint callback
+        # checkpoint callback -> 학습 중 일정 주기마다 체크포인트 저장
         ckpt_path = os.path.join(cfg.CKPT_PATH, cfg.EXPR_NAME)
         os.makedirs(ckpt_path, exist_ok=True)
         callbacks.append(
